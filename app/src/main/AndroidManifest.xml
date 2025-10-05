@@ -15,6 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Compras">
         <activity
+            android:name=".view.NewItem"
+            android:exported="false" />
+        <activity
+            android:name=".view.ItemList"
+            android:exported="false" />
+        <activity
             android:name=".view.ListDetail"
             android:exported="false" />
         <activity

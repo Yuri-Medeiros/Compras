@@ -1,11 +1,11 @@
 package com.example.compras.view
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.compras.R
 import com.example.compras.controll.ListControll
 import com.example.compras.databinding.ActivityNewListBinding
 
@@ -24,10 +23,13 @@ class NewList : AppCompatActivity() {
     private var imgURI: Uri? = null
 
     private val pickImageGalery = registerForActivityResult(
-        ActivityResultContracts.GetContent()
+        ActivityResultContracts.OpenDocument()
     ) {
         uri: Uri? ->
         uri?.let {
+
+            saveUriPermission(it)
+
             imgURI = it
             imgView.setImageURI(it)
         }
@@ -37,7 +39,7 @@ class NewList : AppCompatActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean? ->
         if (isGranted == true) {
-            pickImageGalery.launch(".image/*")
+            pickImageGalery.launch(arrayOf("image/*"))
         } else {
 
             Toast.makeText(this, "O acesso à galeria foi negada", Toast.LENGTH_SHORT).show()
@@ -51,7 +53,7 @@ class NewList : AppCompatActivity() {
         val binding = ActivityNewListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -59,9 +61,16 @@ class NewList : AppCompatActivity() {
 
         imgView = binding.ivImg
 
+        val currentShopList = ListControll.getCurrentList()
+
+        if (currentShopList != null) {
+            binding.etTil.setText(currentShopList.title)
+            imgView.setImageURI(currentShopList.img)
+            imgURI = currentShopList.img
+        }
+
         binding.btImg.setOnClickListener {
 
-            Toast.makeText(this, Manifest.permission.READ_EXTERNAL_STORAGE.toString(), Toast.LENGTH_SHORT).show()
             checkAndOpenGalery()
         }
 
@@ -74,8 +83,17 @@ class NewList : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (currentShopList != null &&
+                (currentShopList.title != title.text.toString() ||
+                currentShopList.img != imgURI)) {
+
+                ListControll.editList(currentShopList, title.text.toString(), imgURI)
+
+                ListControll.setCurrentList(null)
+                finish()
+            }
+
             ListControll.adicionarList(title.text.toString(), imgURI)
-            Log.d("SALVOU A LISTA?", ListControll.getListFiltered().toString())
             finish()
         }
     }
@@ -93,12 +111,23 @@ class NewList : AppCompatActivity() {
                 this, permission
             ) == PackageManager.PERMISSION_GRANTED -> {
 
-                    pickImageGalery.launch(".image/*")
+                    pickImageGalery.launch(arrayOf("image/*"))
             }
 
             else -> {
                 getPermissionGalery.launch(permission)
             }
+        }
+    }
+
+    private fun saveUriPermission(uri: Uri) {
+        val contentResolver = applicationContext.contentResolver
+
+        val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        try {
+            contentResolver.takePersistableUriPermission(uri, takeFlags)
+        } catch (e: SecurityException) {
+            e.printStackTrace()
         }
     }
 }

@@ -4,7 +4,7 @@ import android.net.Uri
 
 data class ShopList(
 
-    val title: String,
-    val img: Uri? = null,
+    var title: String,
+    var img: Uri? = null,
     var items: MutableList<Item>? = null
 )

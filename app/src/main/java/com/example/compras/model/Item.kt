@@ -2,8 +2,9 @@ package com.example.compras.model
 
 data class Item(
 
-    val name: String,
-    val unidade: String,
-    val quantidade: Int,
-    val categoria: String
+    var name: String,
+    var unidade: String,
+    var quantidade: Int,
+    var categoria: String,
+    var comprado: Boolean = false
 )

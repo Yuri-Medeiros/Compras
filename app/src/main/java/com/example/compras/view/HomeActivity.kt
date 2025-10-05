@@ -2,6 +2,8 @@ package com.example.compras.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -16,8 +18,10 @@ class HomeActivity : AppCompatActivity() {
 
     private val adapter = ListAdapter(ListControll.getListFiltered(), { shopList ->
 
+        ListControll.setCurrentList(shopList)
+
         val intent = Intent(this, ListDetail::class.java)
-        intent.putExtra("shopList", shopList.title)
+        intent.putExtra("titleList", shopList.title)
         startActivity(intent)
     })
 
@@ -67,5 +71,7 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume(){
         super.onResume()
         adapter.notifyDataSetChanged()
+
+        Log.d("Segundo objeto adicionado", ListControll.getListFiltered().toString())
     }
 }
