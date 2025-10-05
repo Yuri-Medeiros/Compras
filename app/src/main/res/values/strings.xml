@@ -1,7 +1,1 @@
-<resources>
-    <string name="app_name">Compras</string>
-    <string name="bem_vindo">Seja bem-vindo(a)</string>
-    <string name="dscLogo">Imagem de uma sacola de compras com o texto: Compras YL</string>
-    <string name="iptUser">Usuário</string>
-    <string name="iptPsw">Senha</string>
-</resources>
+<resources></resources>
