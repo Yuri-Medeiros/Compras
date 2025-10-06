@@ -67,8 +67,7 @@ class CadastroActivity : AppCompatActivity() {
             }
 
             Toast.makeText(this, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            finish()
         }
     }
 
