@@ -19,27 +19,46 @@ object ListControll {
         return currentList
     }
 
-    fun getShopList(shopList: ShopList): ShopList? {
+    fun getShopLists(): MutableList<ShopList> {
+        return shopLists
+    }
 
-        return shopLists.find { it == shopList }
+    fun getShopList(title: String, img: Uri?): ShopList? {
+
+        var shopList: ShopList?
+
+        if (img == null) {
+            shopList = shopLists.find { it.title == title }
+        } else {
+            shopList = shopLists.find { it.title == title && it.img == img }
+        }
+
+        return shopList
     }
 
     fun adicionarList(title: String, img: Uri?) {
 
-        val shopList = ShopList(title, img)
+        if (getShopList(title, img) == null){
 
-        if (getShopList(shopList) == null){
-
-            shopLists.add(shopList)
+            shopLists.add(ShopList(title, img))
             updateList()
+
+        } else {
+
+            throw IllegalArgumentException("DUPLICADO")
         }
     }
 
     fun editList(oldList: ShopList, newTitle: String, img: Uri?) {
 
+        if (oldList.title != newTitle && shopLists.find { it.title == newTitle } != null) {
+            throw IllegalArgumentException("DUPLICADO")
+        }
+
         val sl = shopLists.find { it == oldList }
         sl?.title = newTitle
         sl?.img = img
+        updateList()
     }
 
     fun deleteList(shopList: ShopList) {
@@ -51,6 +70,11 @@ object ListControll {
 
     fun updateList() {
         listFiltered = shopLists
+
+        if (currentList != null){
+            val shopList = shopLists.find { it.title == currentList?.title }
+            currentList?.items = shopList?.items
+        }
     }
 
     fun filter(search: String) {
@@ -66,21 +90,6 @@ object ListControll {
             title || items != null
 
         }.toMutableList()
-    }
-
-    fun addItemInList(item: Item){
-
-        val list = shopLists.find { currentList?.title == it.title }
-
-        if (list == null) return
-
-        if (list.items != null) {
-            list.items?.add(item)
-        } else {
-            list.items = mutableListOf<Item>(item)
-        }
-
-        updateList()
     }
 
     fun setCurrentList(list: ShopList?) {

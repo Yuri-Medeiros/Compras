@@ -17,9 +17,7 @@ class HomeActivity : AppCompatActivity() {
     private val adapter = ListAdapter(ListControll.getListFiltered(), { shopList ->
 
         ListControll.setCurrentList(shopList)
-
         val intent = Intent(this, ListDetail::class.java)
-        intent.putExtra("titleList", shopList.title)
         startActivity(intent)
     })
 

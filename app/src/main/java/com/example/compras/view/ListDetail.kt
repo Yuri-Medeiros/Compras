@@ -2,6 +2,7 @@ package com.example.compras.view
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -11,20 +12,19 @@ import com.example.compras.adapter.ItemAdapter
 import com.example.compras.controll.ItemControll
 import com.example.compras.controll.ListControll
 import com.example.compras.databinding.ActivityListDetailBinding
-import com.example.compras.model.Item
 
 class ListDetail : AppCompatActivity() {
 
     private val adapter = ItemAdapter(ItemControll.getItems(), {
-        item: Item? -> {
-
+        item ->
             if (item != null) {
+                Log.d("ITEM", item.toString())
 
                 ItemControll.setCurrentItem(item)
                 val intent = Intent(this, NewItem::class.java)
                 startActivity(intent)
             }
-    }})
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -76,7 +76,13 @@ class ListDetail : AppCompatActivity() {
 
     override fun onResume(){
         super.onResume()
+        adapter.items = ListControll.getCurrentList()?.items
         adapter.notifyDataSetChanged()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ListControll.setCurrentList(null)
     }
 
 }

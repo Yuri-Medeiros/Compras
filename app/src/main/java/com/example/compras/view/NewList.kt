@@ -78,23 +78,48 @@ class NewList : AppCompatActivity() {
 
             val title = binding.etTil
 
+            //Se o titulo foi informado
             if (title.text.toString().isEmpty()){
                 title.error = "Titulo é obrigatório"
                 return@setOnClickListener
             }
 
-            if (currentShopList != null &&
-                (currentShopList.title != title.text.toString() ||
-                currentShopList.img != imgURI)) {
+            try {
 
-                ListControll.editList(currentShopList, title.text.toString(), imgURI)
+                if (currentShopList != null) {
+                    //Editando ja existente
 
-                ListControll.setCurrentList(null)
-                finish()
+                    if (currentShopList.title != title.text.toString() ||
+                        currentShopList.img != imgURI
+                    ) {
+                        //Realmente está editando algo
+
+                        ListControll.editList(currentShopList, title.text.toString(), imgURI)
+                        ListControll.setCurrentList(null)
+                        finish()
+                    }
+
+                } else {
+                    //Adicionando novo
+
+                    ListControll.adicionarList(title.text.toString(), imgURI)
+                    finish()
+                }
+
+            } catch (e: IllegalArgumentException) {
+
+                if (e.message == "DUPLICADO") {
+                    //Se duplicado
+
+                    Toast.makeText(
+                        this,
+                        "${title.text.toString()} já existe",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@setOnClickListener
+
+                }
             }
-
-            ListControll.adicionarList(title.text.toString(), imgURI)
-            finish()
         }
     }
 

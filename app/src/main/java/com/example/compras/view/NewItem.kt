@@ -1,13 +1,12 @@
 package com.example.compras.view
 
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.compras.controll.ItemControll
-import com.example.compras.controll.ListControll
 import com.example.compras.databinding.ActivityNewItemBinding
 
 class
@@ -31,14 +30,13 @@ NewItem : AppCompatActivity() {
         val qnt = binding.etQnt
         val uni = binding.etUn
 
-        if (intent.getStringExtra("nomeItem") != null) {
-            name.setText(intent.getStringExtra("nomeItem"))
-        } else if (intent.getStringExtra("catItem") != null) {
-            categoria.setText(intent.getStringExtra("catItem"))
-        } else if (intent.getStringExtra("qntItem") != null) {
-            qnt.setText(intent.getStringExtra("qntItem"))
-        } else if (intent.getStringExtra("unItem") != null) {
-            uni.setText(intent.getStringExtra("unItem"))
+        val itemEdit = ItemControll.getCurrentItem()
+
+        if (itemEdit != null) {
+            name.setText(itemEdit.name)
+            categoria.setText(itemEdit.categoria)
+            qnt.setText(itemEdit.quantidade.toString())
+            uni.setText(itemEdit.unidade)
         }
 
         binding.btAdd.setOnClickListener {
@@ -63,15 +61,60 @@ NewItem : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            ItemControll.adicionarItem(
-                name.text.toString(),
-                categoria.text.toString(),
-                qnt.text.toString().toInt(),
-                uni.text.toString()
-            )
+            if (name.text.toString() == ItemControll.getCurrentItem()?.name &&
+                categoria.text.toString() == ItemControll.getCurrentItem()?.categoria &&
+                qnt.text.toString().toInt() == ItemControll.getCurrentItem()?.quantidade &&
+                uni.text.toString() == ItemControll.getCurrentItem()?.unidade) {
+                return@setOnClickListener
+            }
 
-            Log.d("SERA QUE ADD", ListControll.getCurrentList()?.items.toString())
-            finish()
+            try {
+
+                if (ItemControll.getCurrentItem() == null) {
+
+                    ItemControll.adicionarItem(
+                        name.text.toString(),
+                        categoria.text.toString(),
+                        qnt.text.toString().toInt(),
+                        uni.text.toString()
+                    )
+
+                } else {
+
+                    ItemControll.editItem(
+                        name.text.toString(),
+                        categoria.text.toString(),
+                        qnt.text.toString().toInt(),
+                        uni.text.toString()
+                    )
+                    ItemControll.setCurrentItem(null)
+                }
+                finish()
+
+            } catch (e: IllegalArgumentException) {
+
+                if (e.message == "DUPLICADO") {
+
+                    Toast.makeText(this, "${name.text.toString()} já existe", Toast.LENGTH_SHORT).show()
+                }
+            }
+
         }
+
+        binding.btDlt.setOnClickListener {
+
+            if (ItemControll.getCurrentItem() != null) {
+
+                ItemControll.deleteItem()
+                finish()
+            } else {
+                Toast.makeText(this, "Item ainda não adicionado", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ItemControll.setCurrentItem(null)
     }
 }

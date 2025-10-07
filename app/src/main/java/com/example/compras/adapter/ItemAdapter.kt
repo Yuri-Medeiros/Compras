@@ -8,10 +8,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.compras.databinding.ActivityItemBinding
 import com.example.compras.model.Item
-import kotlin.or
 
 class ItemAdapter(
-    private var items: MutableList<Item>?,
+    var items: MutableList<Item>?,
     private val onItemClick: (Item?) -> Unit
 ) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
